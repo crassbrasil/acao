@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Doar via Pix</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; text-align: center; background: #f0f0f0; }
+    .btn { padding: 1rem 2rem; margin: 0.5rem; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; }
+    textarea { width: 90%; margin-top: 1rem; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <h1>Doação via Pix</h1>
+  <p>Escolha um valor para doar:</p>
+  <button class="btn" onclick="gerarPix(30)">R$30</button>
+  <button class="btn" onclick="gerarPix(50)">R$50</button>
+  <button class="btn" onclick="gerarPix(100)">R$100</button>
+
+  <div id="pix-info" style="display:none;">
+    <h3>Pix gerado:</h3>
+    <textarea id="pix-code" rows="4" readonly></textarea>
+    <br>
+    <button class="btn" onclick="copiarPix()">Copiar</button>
+  </div>
+
+  <script>
+    function gerarPix(valor) {
+      fetch('https://unido-production.up.railway.app/pix', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ value: valor })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.pix) {
+          document.getElementById('pix-code').value = data.pix;
+          document.getElementById('pix-info').style.display = 'block';
+        } else {
+          alert('Erro ao gerar Pix.');
+        }
+      })
+      .catch(() => alert('Erro ao conectar com o servidor.'));
+    }
+
+    function copiarPix() {
+      const area = document.getElementById('pix-code');
+      area.select();
+      document.execCommand('copy');
+      alert('Código Pix copiado!');
+    }
+  </script>
+</body>
+</html>
